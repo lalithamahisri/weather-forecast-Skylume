@@ -180,7 +180,7 @@ Potential future enhancements include:
 
 ## 👩‍💻 Author
 
-**Lalitha Mahi Sri**
+**Lalitha mahisri Mallepudi**
 
 Computer Science & Engineering
 
