@@ -34,18 +34,35 @@ function App() {
     return localStorage.getItem('skylume-theme') || 'dark';
   });
 
+const DEFAULT_SAVED_LOCATIONS = [
+  { name: 'Hyderabad', country: 'India', admin1: 'Telangana', lat: 17.3850, lng: 78.4867 },
+  { name: 'London', country: 'United Kingdom', admin1: 'England', lat: 51.5074, lng: -0.1278 },
+  { name: 'Tokyo', country: 'Japan', admin1: 'Tokyo', lat: 35.6762, lng: 139.6503 },
+  { name: 'New York', country: 'United States', admin1: 'New York', lat: 40.7128, lng: -74.0060 },
+  { name: 'Paris', country: 'France', admin1: 'Île-de-France', lat: 48.8566, lng: 2.3522 }
+];
+
   const [savedLocs, setSavedLocs] = useState(() => {
     try {
       const stored = localStorage.getItem('skylume-saved-locations');
-      return stored ? JSON.parse(stored) : [
-        { name: 'Hyderabad', country: 'India', admin1: 'Telangana', lat: 17.3850, lng: 78.4867 },
-        { name: 'London', country: 'United Kingdom', admin1: 'England', lat: 51.5074, lng: -0.1278 },
-        { name: 'Tokyo', country: 'Japan', admin1: 'Tokyo', lat: 35.6762, lng: 139.6503 }
-      ];
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_SAVED_LOCATIONS;
     } catch (e) {
-      return [];
+      return DEFAULT_SAVED_LOCATIONS;
     }
   });
+
+  // Persist saved locations to localStorage whenever updated
+  useEffect(() => {
+    try {
+      localStorage.setItem('skylume-saved-locations', JSON.stringify(savedLocs));
+    } catch (e) {
+      console.error('Failed to save locations to localStorage:', e);
+    }
+  }, [savedLocs]);
 
   // Apply theme to document root & persist
   useEffect(() => {
@@ -91,8 +108,12 @@ function App() {
         lat: location.lat,
         lng: location.lng
       };
-      setSavedLocs((prev) => [newLoc, ...prev]);
+      setSavedLocs((prev) => [newLoc, ...prev.filter((l) => l.name.toLowerCase() !== location.name.toLowerCase())]);
     }
+  };
+
+  const removeLocation = (locName) => {
+    setSavedLocs((prev) => prev.filter((l) => l.name.toLowerCase() !== locName.toLowerCase()));
   };
 
   // Initial full skeleton loading state
@@ -202,6 +223,8 @@ function App() {
               location={location} 
               weatherData={weatherData} 
               onMapClick={handleSelectLocation}
+              isSaved={isCurrentSaved}
+              onToggleSave={toggleSaveCurrent}
               unit={unit}
               theme={theme}
             />
@@ -210,8 +233,13 @@ function App() {
           {/* RIGHT: SAVED CITIES & 7-DAY FORECAST */}
           <div className="grid-forecast-column">
             <SavedLocations 
+              savedLocs={savedLocs}
               currentLocation={location}
               onSelectLocation={handleSelectLocation}
+              onRemoveLocation={removeLocation}
+              onToggleSaveCurrent={toggleSaveCurrent}
+              isCurrentSaved={isCurrentSaved}
+              onResetDefaults={() => setSavedLocs(DEFAULT_SAVED_LOCATIONS)}
               unit={unit}
             />
             <DailyForecast 

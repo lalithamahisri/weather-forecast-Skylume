@@ -192,7 +192,12 @@ export function useWeather() {
     }
   }, []);
 
-  const setCoordinates = useCallback(async (lat, lng) => {
+  const setCoordinates = useCallback(async (lat, lng, locDetails) => {
+    if (locDetails && locDetails.name) {
+      await fetchWeather(lat, lng, locDetails);
+      return;
+    }
+
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`,
@@ -203,7 +208,7 @@ export function useWeather() {
         }
       );
       
-      let locDetails = {
+      let newLocDetails = {
         lat,
         lng,
         name: 'Selected Point',
@@ -221,10 +226,10 @@ export function useWeather() {
         const country = address?.country || '';
         const admin1 = address?.state || address?.region || '';
         
-        locDetails = { lat, lng, name, country, admin1 };
+        newLocDetails = { lat, lng, name, country, admin1 };
       }
       
-      await fetchWeather(lat, lng, locDetails);
+      await fetchWeather(lat, lng, newLocDetails);
     } catch (err) {
       console.error('Reverse geocode error:', err);
       const fallbackLoc = {
