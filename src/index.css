@@ -1,116 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-:root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', var(--font-sans);
-  
-  /* Primary Dark Navy Glassmorphism Palette */
-  --bg-dark-base: #060b17;
-  --bg-gradient: linear-gradient(145deg, #060b17 0%, #0d1527 50%, #111a33 100%);
-  --card-bg: rgba(15, 25, 45, 0.55);
-  --card-bg-hover: rgba(22, 36, 64, 0.75);
-  --card-border: rgba(255, 255, 255, 0.1);
-  --card-border-hover: rgba(56, 189, 248, 0.35);
-  
+:root,
+[data-theme="dark"] {
+  --font-sans: 'Plus Jakarta Sans', 'Inter', 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Premium Atmospheric Dark Theme Tokens */
+  --bg-primary: #070a0f;
+  --bg-secondary: #0d131f;
+  --bg-tertiary: #172033;
+  --bg-surface: rgba(13, 19, 31, 0.65);
+  --bg-surface-hover: rgba(23, 32, 51, 0.85);
+
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-medium: rgba(255, 255, 255, 0.18);
+  --border-focus: rgba(56, 189, 248, 0.5);
+
+  /* ================================
+     DARK MODE TEXT COLORS
+     ================================ */
+
+  /* Main headings / important text */
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-color: #38bdf8;
-  --accent-glow: rgba(56, 189, 248, 0.25);
-  --shadow-color: rgba(0, 0, 0, 0.4);
-  --glass-blur: 24px;
-  
-  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  font-weight: 400;
-  
+
+  /* Normal readable text */
+  --text-secondary: #cbd5e1;
+
+  /* Muted but still clearly visible */
+  --text-muted: #94a3b8;
+
+  /* Extra secondary text */
+  --text-tertiary: #a8b5c7;
+
+  /* Accent */
+  --accent-primary: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+
+  --accent-amber: #f59e0b;
+  --accent-violet: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+
+  --shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px -6px rgba(0, 0, 0, 0.5);
+
+  --card-radius: 20px;
+  --inner-radius: 12px;
+
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
   color-scheme: dark;
-  background-color: var(--bg-dark-base);
-  color: var(--text-primary);
-  
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient Visual Effects Base Layer */
-.ambient-weather-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
+[data-theme="light"] {
+  /* Pale Blue Light Theme Tokens */
+  --bg-primary: #dbeafe;
+  --bg-secondary: #cfe3fd;
+  --bg-tertiary: #bfdbfe;
+  --bg-surface: rgba(240, 248, 255, 0.82);
+  --bg-surface-hover: rgba(255, 255, 255, 0.95);
 
-.ambient-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: opacity 1.5s ease, background 1.5s ease;
-  pointer-events: none;
-}
+  --border-subtle: rgba(147, 197, 253, 0.4);
+  --border-medium: rgba(96, 165, 250, 0.4);
+  --border-focus: rgba(2, 132, 199, 0.6);
 
-.ambient-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
+  --text-primary: #0b2545;
+  --text-secondary: #335577;
+  --text-muted: #6488a8;
 
-/* Specific Weather Ambient Overlay Themes */
-.ambient-type-thunderstorm {
-  background: radial-gradient(circle at 50% 20%, rgba(30, 27, 75, 0.6) 0%, rgba(6, 11, 23, 0.95) 100%);
-}
+  --accent-primary: #0284c7;
+  --accent-glow: rgba(2, 132, 199, 0.15);
 
-.ambient-type-rain {
-  background: radial-gradient(circle at 50% 30%, rgba(14, 116, 144, 0.25) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
+  --accent-amber: #d97706;
+  --accent-violet: #9333ea;
+  --accent-emerald: #059669;
+  --accent-rose: #e11d48;
 
-.ambient-type-snow {
-  background: radial-gradient(circle at 50% 30%, rgba(224, 242, 254, 0.15) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
+  --shadow-sm: 0 2px 8px 0 rgba(14, 116, 144, 0.06);
+  --shadow-md: 0 8px 24px -4px rgba(14, 116, 144, 0.10);
+  --shadow-lg: 0 16px 40px -6px rgba(14, 116, 144, 0.14);
 
-.ambient-type-clear-hot {
-  background: radial-gradient(circle at 70% 20%, rgba(249, 115, 22, 0.2) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
-
-.ambient-type-clear-cold {
-  background: radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.18) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
-
-.ambient-type-clear-night {
-  background: radial-gradient(circle at 50% 10%, rgba(30, 41, 59, 0.4) 0%, rgba(5, 10, 20, 0.95) 100%);
-}
-
-.ambient-type-cloudy {
-  background: radial-gradient(circle at 50% 30%, rgba(71, 85, 105, 0.3) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
-
-.ambient-type-fog {
-  background: radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.25) 0%, rgba(6, 11, 23, 0.95) 100%);
-}
-
-.ambient-type-windy {
-  background: radial-gradient(circle at 30% 30%, rgba(14, 165, 233, 0.2) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
-
-.ambient-type-clear-day {
-  background: radial-gradient(circle at 70% 20%, rgba(56, 189, 248, 0.2) 0%, rgba(6, 11, 23, 0.9) 100%);
-}
-
-.ambient-type-default {
-  background: radial-gradient(circle at 50% 30%, rgba(15, 25, 45, 0.5) 0%, rgba(6, 11, 23, 0.9) 100%);
+  color-scheme: light;
 }
 
 * {
@@ -119,178 +92,341 @@
   padding: 0;
 }
 
+html,
 body {
-  margin: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
+  min-height: 100%;
+  width: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: var(--font-sans);
-  background-color: var(--bg-dark-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* =========================================================
+   DEFAULT DARK MODE TEXT
+   ========================================================= */
+
+[data-theme="dark"] {
   color: var(--text-primary);
 }
 
-/* Glassmorphism & Depth Utilities */
-.glass-panel {
-  background: var(--card-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(120%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(120%);
-  border: 1px solid var(--card-border);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px 0 var(--shadow-color);
-  transition: var(--transition-smooth);
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: var(--text-primary);
 }
 
-.glass-panel-hover:hover {
-  background: var(--card-bg-hover);
-  border-color: var(--card-border-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+[data-theme="dark"] p {
+  color: var(--text-secondary);
 }
 
-/* Scrollbar styling */
+[data-theme="dark"] small {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] button {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] input {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] input::placeholder {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] a {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] a:hover {
+  color: var(--accent-primary);
+}
+
+/* =========================================================
+   CUSTOM PANEL BASE
+   ========================================================= */
+
+.sk-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.sk-panel-interactive:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-md);
+}
+
+/* =========================================================
+   TYPOGRAPHY HELPERS
+   ========================================================= */
+
+.sk-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.sk-heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Dark mode typography helpers */
+[data-theme="dark"] .sk-heading {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .sk-label {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .text-secondary {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   WEATHER TEXT
+   ========================================================= */
+
+[data-theme="dark"] .temperature,
+[data-theme="dark"] .temp,
+[data-theme="dark"] .weather-temperature {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .feels-like,
+[data-theme="dark"] .high-low,
+[data-theme="dark"] .weather-description {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .weather-condition,
+[data-theme="dark"] .condition {
+  color: var(--accent-primary);
+}
+
+[data-theme="dark"] .forecast-time,
+[data-theme="dark"] .forecast-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .forecast-temp {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .precipitation,
+[data-theme="dark"] .precipitation-percent {
+  color: var(--accent-primary);
+}
+
+[data-theme="dark"] .saved-city,
+[data-theme="dark"] .city-name {
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   AMBIENT BACKGROUND LAYER
+   ========================================================= */
+
+.ambient-weather-container {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.ambient-overlay {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+[data-theme="light"] .ambient-overlay {
+  opacity: 0.35;
+}
+
+.ambient-type-clear-day {
+  background: radial-gradient(circle at 80% 20%,
+      rgba(56, 189, 248, 0.18) 0%,
+      transparent 60%);
+}
+
+.ambient-type-clear-night {
+  background: radial-gradient(circle at 80% 20%,
+      rgba(99, 102, 241, 0.18) 0%,
+      transparent 60%);
+}
+
+.ambient-type-rain {
+  background: radial-gradient(circle at 50% 30%,
+      rgba(14, 165, 233, 0.18) 0%,
+      transparent 70%);
+}
+
+.ambient-type-thunderstorm {
+  background: radial-gradient(circle at 50% 20%,
+      rgba(168, 85, 247, 0.22) 0%,
+      transparent 70%);
+}
+
+.ambient-type-cloudy {
+  background: radial-gradient(circle at 50% 30%,
+      rgba(148, 163, 184, 0.15) 0%,
+      transparent 70%);
+}
+
+.ambient-type-snow {
+  background: radial-gradient(circle at 50% 30%,
+      rgba(224, 242, 254, 0.18) 0%,
+      transparent 70%);
+}
+
+.ambient-type-fog {
+  background: radial-gradient(circle at 50% 50%,
+      rgba(203, 213, 225, 0.15) 0%,
+      transparent 70%);
+}
+
+.ambient-canvas {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: block;
+}
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+   ========================================================= */
+
 .custom-scrollbar::-webkit-scrollbar {
   height: 5px;
   width: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  background: var(--border-medium);
+  border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.5);
+  background: var(--accent-primary);
 }
 
-/* Animation utilities */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.animate-fade {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin {
   animation: spin 1s linear infinite;
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.09) 50%,
-    rgba(255, 255, 255, 0.03) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--border-subtle) 25%,
+      var(--border-medium) 50%,
+      var(--border-subtle) 75%);
+
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+/* =========================================================
+   LEAFLET MAP ADAPTATION
+   ========================================================= */
 
-/* Leaflet Map Overrides */
 .leaflet-container {
   font-family: var(--font-sans) !important;
-  background-color: #0d1527 !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.leaflet-tile {
+  filter: none !important;
 }
 
 .leaflet-bar {
-  border: none !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  border-radius: 12px !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--inner-radius) !important;
+  box-shadow: var(--shadow-md) !important;
   overflow: hidden;
 }
 
 .leaflet-bar a {
-  background-color: rgba(15, 25, 45, 0.85) !important;
-  backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--card-border) !important;
+  background-color: var(--bg-surface) !important;
   color: var(--text-primary) !important;
-  transition: var(--transition-fast) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
 }
 
 .leaflet-bar a:hover {
-  background-color: var(--card-bg-hover) !important;
-  color: var(--accent-color) !important;
+  background-color: var(--bg-surface-hover) !important;
+  color: var(--accent-primary) !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: rgba(15, 25, 45, 0.95) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid var(--card-border) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-lg) !important;
   color: var(--text-primary) !important;
 }
 
 .leaflet-popup-tip {
-  background: rgba(15, 25, 45, 0.95) !important;
-}
-
-.leaflet-popup-content {
-  margin: 12px 16px !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-}
-
-.custom-map-marker {
-  position: relative;
-}
-
-.marker-pin-outer {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent-color);
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 16px var(--accent-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.marker-pin-inner {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ffffff;
-}
-
-.marker-pulse {
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--accent-color);
-  opacity: 0.25;
-  animation: pulse-slow 2s infinite ease-in-out;
-  pointer-events: none;
-}
-
-@keyframes pulse-slow {
-  0%, 100% { transform: scale(0.9); opacity: 0.2; }
-  50% { transform: scale(1.1); opacity: 0.4; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ambient-canvas, .marker-pulse, .animate-spin {
-    animation: none !important;
-    transition: none !important;
-  }
+  background: var(--bg-primary) !important;
 }

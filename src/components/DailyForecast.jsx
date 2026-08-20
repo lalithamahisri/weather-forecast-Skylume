@@ -2,203 +2,221 @@ import React from 'react';
 import WeatherIcon from './WeatherIcon';
 
 const formatTemp = (celsius, unit) => {
-  if (unit === 'F') {
-    return Math.round((celsius * 9) / 5 + 32);
-  }
+  if (unit === 'F') return Math.round((celsius * 9) / 5 + 32);
   return celsius;
 };
 
-export default function DailyForecast({ dailyData, unit }) {
+export default function DailyForecast({ dailyData = [], unit = 'C' }) {
   const maxTemps = dailyData.map((d) => d.maxTemp);
   const minTemps = dailyData.map((d) => d.minTemp);
-  const absoluteMax = Math.max(...maxTemps);
-  const absoluteMin = Math.min(...minTemps);
+  const absoluteMax = Math.max(...(maxTemps.length ? maxTemps : [30]));
+  const absoluteMin = Math.min(...(minTemps.length ? minTemps : [0]));
   const tempRange = absoluteMax - absoluteMin || 1;
 
   return (
-    <div className="glass-panel daily-forecast-panel">
-      <h3 className="daily-forecast-title">7-Day Forecast</h3>
+    <section className="daily-clean-container">
+      <div className="daily-clean-header">
+        <span className="sk-label">7-DAY FORECAST</span>
+      </div>
 
-      <div className="daily-rows-container">
-        {dailyData.map((day, index) => {
-          const isToday = index === 0;
+      <div className="daily-clean-list">
+        {dailyData.map((day, idx) => {
+          const isToday = idx === 0;
           const formattedMax = formatTemp(day.maxTemp, unit);
           const formattedMin = formatTemp(day.minTemp, unit);
 
-          // Position range bar relative to full week's absolute min and max
           const barLeft = ((day.minTemp - absoluteMin) / tempRange) * 100;
           const barWidth = ((day.maxTemp - day.minTemp) / tempRange) * 100;
 
           return (
-            <div
-              key={index}
-              className={`daily-row ${isToday ? 'daily-row-today' : ''}`}
-            >
-              {/* Day Name */}
-              <span className={`day-name ${isToday ? 'day-name-today' : ''}`}>
-                {day.dayName}
-              </span>
-
-              {/* Weather Icon */}
-              <div className="day-icon-wrapper">
-                <WeatherIcon conditionKey={day.conditionKey} size={20} />
+            <div key={idx} className={`daily-clean-row ${isToday ? 'row-is-today' : ''}`}>
+              <div className="row-day-col">
+                <span className={`row-day-name ${isToday ? 'day-highlight' : ''}`}>
+                  {isToday ? 'Today' : day.dayName}
+                </span>
+                <span className="row-date-sub">{day.date}</span>
               </div>
 
-              {/* Rain Probability */}
-              <span className={`day-precip ${day.precipitationProbability > 5 ? 'precip-active' : ''}`}>
-                💧{day.precipitationProbability}%
-              </span>
+              <div className="row-icon-col">
+                <WeatherIcon conditionKey={day.conditionKey} size={18} />
+              </div>
 
-              {/* Weekly Relative Range Bar */}
-              <div className="day-range-bar-wrapper">
-                <span className="temp-low">{formattedMin}°</span>
-                
-                <div className="range-bar-track">
-                  <div 
-                    className="range-bar-fill"
+              <span className="row-condition-col">{day.condition}</span>
+
+              {/* Temperature Bar */}
+              <div className="row-spectrum-col">
+                <span className="temp-val low-val">{formattedMin}°</span>
+                <div className="bar-track">
+                  <div
+                    className="bar-fill"
                     style={{
                       left: `${barLeft}%`,
-                      width: `${Math.max(barWidth, 6)}%`
-                    }} 
+                      width: `${Math.max(barWidth, 8)}%`
+                    }}
                   />
                 </div>
-
-                <span className="temp-high">{formattedMax}°</span>
+                <span className="temp-val high-val">{formattedMax}°</span>
               </div>
 
-              {/* Full Untruncated Weather Condition Text */}
-              <span className="day-condition-full">
-                {day.condition}
-              </span>
+              <div className="row-rain-col">
+                {day.precipitationProbability > 0 ? (
+                  <span className="rain-badge">💧 {day.precipitationProbability}%</span>
+                ) : (
+                  <span className="rain-badge-muted">0%</span>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
 
       <style>{`
-        .daily-forecast-panel {
-          padding: 20px 24px;
+        .daily-clean-container {
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 14px;
-          height: 100%;
+          gap: 12px;
+          padding: 20px;
+          border-radius: var(--card-radius);
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(16px);
+          border: 1px solid var(--border-subtle);
         }
-        .daily-forecast-title {
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--text-secondary);
+
+        .daily-clean-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
-        .daily-rows-container {
+
+        .daily-clean-list {
           display: flex;
           flex-direction: column;
-          gap: 8px;
         }
-        .daily-row {
+
+        .daily-clean-row {
           display: grid;
-          grid-template-columns: 80px 32px 42px 1fr 125px;
+          grid-template-columns: 80px 32px 130px 1fr 60px;
           align-items: center;
-          padding: 8px 12px;
-          border-radius: 12px;
-          background: rgba(15, 25, 45, 0.4);
-          border: 1px solid transparent;
-          transition: var(--transition-fast);
-          gap: 8px;
+          gap: 12px;
+          padding: 10px 8px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          transition: background var(--transition-fast);
         }
-        .daily-row:hover {
-          background: var(--card-bg-hover);
-          border-color: var(--card-border);
-          transform: translateX(2px);
+
+        .daily-clean-row:last-child {
+          border-bottom: none;
         }
-        .daily-row-today {
-          background: rgba(15, 25, 45, 0.7);
-          border-color: rgba(56, 189, 248, 0.3);
+
+        .daily-clean-row:hover {
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: var(--inner-radius);
         }
-        .day-name {
+
+        .row-is-today {
+          background: rgba(56, 189, 248, 0.06);
+          border-radius: var(--inner-radius);
+        }
+
+        .row-day-col {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .row-day-name {
           font-size: 13px;
           font-weight: 600;
           color: var(--text-primary);
         }
-        .day-name-today {
+
+        .day-highlight {
+          color: var(--accent-primary);
           font-weight: 700;
-          color: var(--accent-color);
         }
-        .day-icon-wrapper {
+
+        .row-date-sub {
+          font-size: 10px;
+          color: var(--text-muted);
+        }
+
+        .row-icon-col {
           display: flex;
           align-items: center;
           justify-content: center;
         }
-        .day-precip {
-          font-size: 11px;
-          font-weight: 700;
-          color: #38bdf8;
-          opacity: 0;
-          text-align: left;
+
+        .row-condition-col {
+          font-size: 12px;
+          color: var(--text-secondary);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .precip-active {
-          opacity: 1;
-        }
-        .day-range-bar-wrapper {
+
+        .row-spectrum-col {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           width: 100%;
         }
-        .temp-low {
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--text-secondary);
+
+        .temp-val {
+          font-family: var(--font-display);
+          font-size: 13px;
+          font-weight: 600;
           width: 26px;
+        }
+
+        .low-val {
+          color: var(--text-secondary);
           text-align: right;
         }
-        .temp-high {
-          font-size: 12px;
-          font-weight: 700;
+
+        .high-val {
           color: var(--text-primary);
-          width: 26px;
           text-align: left;
         }
-        .range-bar-track {
+
+        .bar-track {
           position: relative;
           flex: 1;
           height: 4px;
-          border-radius: 10px;
-          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.08);
           overflow: hidden;
         }
-        .range-bar-fill {
+
+        .bar-fill {
           position: absolute;
           height: 100%;
-          border-radius: 10px;
-          background: linear-gradient(to right, #38bdf8, #f59e0b);
+          border-radius: 4px;
+          background: linear-gradient(to right, var(--accent-primary), var(--accent-amber));
         }
-        .day-condition-full {
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--text-secondary);
+
+        .row-rain-col {
           text-align: right;
-          white-space: nowrap;
         }
-        @media (max-width: 1280px) {
-          .daily-row {
-            grid-template-columns: 75px 28px 38px 1fr 110px;
-            padding: 8px 8px;
-          }
-          .day-condition-full {
-            font-size: 11px;
-          }
+
+        .rain-badge {
+          font-size: 11px;
+          font-weight: 600;
+          color: var(--accent-primary);
         }
-        @media (max-width: 640px) {
-          .daily-row {
-            grid-template-columns: 65px 28px 35px 1fr;
+
+        .rain-badge-muted {
+          font-size: 11px;
+          color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+          .daily-clean-row {
+            grid-template-columns: 70px 28px 1fr 50px;
           }
-          .day-condition-full {
+          .row-condition-col {
             display: none;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }

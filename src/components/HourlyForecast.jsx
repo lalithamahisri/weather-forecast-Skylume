@@ -3,14 +3,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import WeatherIcon from './WeatherIcon';
 
 const formatTemp = (celsius, unit) => {
-  if (unit === 'F') {
-    return Math.round((celsius * 9) / 5 + 32);
-  }
+  if (unit === 'F') return Math.round((celsius * 9) / 5 + 32);
   return celsius;
 };
 
-export default function HourlyForecast({ hourlyData, unit }) {
+export default function HourlyForecast({ hourlyData = [], unit = 'C' }) {
   const scrollRef = useRef(null);
+
+  const displayData = hourlyData ? hourlyData.slice(0, 24) : [];
 
   const handleScrollLeft = () => {
     if (scrollRef.current) {
@@ -25,95 +25,77 @@ export default function HourlyForecast({ hourlyData, unit }) {
   };
 
   return (
-    <div className="glass-panel hourly-forecast-panel">
-      <div className="hourly-header">
-        <h3 className="hourly-title">Hourly Forecast (24h)</h3>
-        
-        {/* Desktop Carousel Navigation Arrows */}
+    <section className="hourly-clean-container">
+      <div className="hourly-clean-header">
+        <span className="sk-label">24-HOUR FORECAST</span>
         <div className="hourly-nav-btns">
-          <button
-            type="button"
-            onClick={handleScrollLeft}
-            className="hourly-nav-btn"
-            title="Scroll left"
-          >
+          <button type="button" onClick={handleScrollLeft} className="nav-arrow" aria-label="Scroll left">
             <ChevronLeft size={15} />
           </button>
-          <button
-            type="button"
-            onClick={handleScrollRight}
-            className="hourly-nav-btn"
-            title="Scroll right"
-          >
+          <button type="button" onClick={handleScrollRight} className="nav-arrow" aria-label="Scroll right">
             <ChevronRight size={15} />
           </button>
         </div>
       </div>
 
-      <div 
-        ref={scrollRef}
-        className="custom-scrollbar hourly-scroll-container" 
-      >
-        {hourlyData.slice(0, 24).map((hour, index) => {
-          const isNow = index === 0;
-          const temp = formatTemp(hour.temperature, unit);
+      <div ref={scrollRef} className="custom-scrollbar hourly-clean-strip">
+        {displayData.map((hour, idx) => {
+          const isNow = idx === 0;
+          const tempVal = formatTemp(hour.temperature, unit);
 
           return (
-            <div
-              key={index}
-              className={`hourly-card ${isNow ? 'hourly-card-now' : ''}`}
-            >
-              <span className={`hourly-time ${isNow ? 'hourly-time-now' : ''}`}>
-                {isNow ? 'Now' : hour.time}
+            <div key={idx} className={`hourly-chip ${isNow ? 'hourly-chip-now' : ''}`}>
+              <span className={`chip-time ${isNow ? 'chip-time-now' : ''}`}>
+                {isNow ? 'NOW' : hour.time}
               </span>
 
-              <div className="hourly-icon-wrapper">
-                <WeatherIcon conditionKey={hour.conditionKey || 'clear'} size={24} />
+              <div className="chip-icon">
+                <WeatherIcon conditionKey={hour.conditionKey || 'clear'} size={20} />
               </div>
 
-              <span className="hourly-temp">{temp}°</span>
+              <span className="chip-temp">{tempVal}°</span>
 
-              {/* Precipitation probability in every card */}
-              <span className="hourly-precip">
-                💧 {hour.precipitationProbability || 0}%
-              </span>
+              {hour.precipitationProbability > 0 ? (
+                <span className="chip-precip">💧 {hour.precipitationProbability}%</span>
+              ) : (
+                <span className="chip-precip-empty" />
+              )}
             </div>
           );
         })}
       </div>
 
       <style>{`
-        .hourly-forecast-panel {
-          padding: 16px 20px;
+        .hourly-clean-container {
           width: 100%;
           display: flex;
           flex-direction: column;
           gap: 12px;
-          overflow: hidden;
+          padding: 16px 20px;
+          border-radius: var(--card-radius);
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(16px);
+          border: 1px solid var(--border-subtle);
         }
-        .hourly-header {
+
+        .hourly-clean-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
-        .hourly-title {
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--text-secondary);
-        }
+
         .hourly-nav-btns {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 4px;
         }
-        .hourly-nav-btn {
+
+        .nav-arrow {
           width: 26px;
           height: 26px;
           border-radius: 8px;
-          border: 1px solid var(--card-border);
-          background: rgba(15, 25, 45, 0.6);
+          border: 1px solid var(--border-subtle);
+          background: rgba(255, 255, 255, 0.04);
           color: var(--text-primary);
           display: flex;
           align-items: center;
@@ -121,78 +103,83 @@ export default function HourlyForecast({ hourlyData, unit }) {
           cursor: pointer;
           transition: var(--transition-fast);
         }
-        .hourly-nav-btn:hover {
-          background: var(--card-bg-hover);
-          border-color: var(--card-border-hover);
-          color: var(--accent-color);
+
+        .nav-arrow:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--accent-primary);
         }
-        .hourly-scroll-container {
+
+        .hourly-clean-strip {
           display: flex;
-          gap: 10px;
+          align-items: center;
+          gap: 8px;
           overflow-x: auto;
-          padding-bottom: 4px;
-          width: 100%;
-          scroll-snap-type: x mandatory;
+          padding-bottom: 6px;
+          scroll-behavior: smooth;
         }
-        .hourly-card {
-          flex: 0 0 74px;
-          scroll-snap-align: start;
+
+        .hourly-chip {
+          flex: 0 0 72px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: space-between;
-          padding: 12px 6px;
-          border-radius: 14px;
-          border: 1px solid var(--card-border);
-          background: rgba(15, 25, 45, 0.5);
+          padding: 10px 4px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid transparent;
+          min-height: 104px;
           transition: var(--transition-fast);
-          min-height: 118px;
-          user-select: none;
         }
-        .hourly-card:hover {
-          background: var(--card-bg-hover);
-          border-color: var(--card-border-hover);
-          transform: translateY(-2px);
+
+        .hourly-chip:hover {
+          background: rgba(255, 255, 255, 0.06);
+          border-color: var(--border-subtle);
         }
-        .hourly-card-now {
-          border-color: var(--accent-color) !important;
-          background: var(--accent-glow) !important;
-          box-shadow: 0 0 10px var(--accent-glow);
+
+        .hourly-chip-now {
+          background: rgba(56, 189, 248, 0.12);
+          border-color: rgba(56, 189, 248, 0.3);
         }
-        .hourly-time {
+
+        .chip-time {
           font-size: 11px;
-          font-weight: 500;
-          color: var(--text-secondary);
+          font-weight: 600;
+          color: var(--text-muted);
         }
-        .hourly-time-now {
+
+        .chip-time-now {
+          color: var(--accent-primary);
           font-weight: 700;
-          color: var(--accent-color);
         }
-        .hourly-icon-wrapper {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 2px 0;
+
+        .chip-icon {
+          margin: 4px 0;
         }
-        .hourly-temp {
+
+        .chip-temp {
+          font-family: var(--font-display);
           font-size: 15px;
           font-weight: 700;
           color: var(--text-primary);
         }
-        .hourly-precip {
+
+        .chip-precip {
           font-size: 10px;
           font-weight: 600;
-          color: #38bdf8;
+          color: var(--accent-primary);
         }
+
+        .chip-precip-empty {
+          height: 14px;
+        }
+
         @media (max-width: 640px) {
-          .hourly-forecast-panel {
-            padding: 14px;
-          }
           .hourly-nav-btns {
             display: none;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }

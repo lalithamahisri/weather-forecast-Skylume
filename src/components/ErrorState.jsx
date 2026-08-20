@@ -3,15 +3,15 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function ErrorState({ message, onRetry }) {
   return (
-    <div className="glass-panel error-state-card">
+    <div className="sk-panel error-state-card">
       <div className="error-icon-wrapper">
-        <AlertCircle size={32} />
+        <AlertCircle size={28} />
       </div>
 
-      <h2 className="error-title">Location Error</h2>
+      <h2 className="sk-heading error-title">Unable to Load Weather</h2>
 
       <p className="error-message">
-        {message || "We couldn't retrieve weather data for this location. Check your connection or search for another city."}
+        {message || "We couldn't retrieve weather data for this location. Please check your internet connection or search for another city."}
       </p>
 
       {onRetry && (
@@ -20,7 +20,7 @@ export default function ErrorState({ message, onRetry }) {
           onClick={onRetry}
           className="retry-btn"
         >
-          <RefreshCw size={15} className="retry-icon" />
+          <RefreshCw size={14} />
           <span>Try Again</span>
         </button>
       )}
@@ -31,61 +31,55 @@ export default function ErrorState({ message, onRetry }) {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 48px 24px;
+          padding: 40px 24px;
           text-align: center;
           margin: 40px auto;
-          max-width: 460px;
-          border-radius: 24px;
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(15, 25, 45, 0.85) 100%);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+          max-width: 440px;
+          border-color: var(--accent-rose);
         }
+
         .error-icon-wrapper {
-          width: 64px;
-          height: 64px;
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
-          background: rgba(239, 68, 68, 0.15);
+          background: rgba(244, 63, 94, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #f87171;
-          margin-bottom: 18px;
+          color: var(--accent-rose);
+          margin-bottom: 16px;
         }
+
         .error-title {
-          font-size: 19px;
-          font-weight: 700;
-          color: var(--text-primary);
+          font-size: 18px;
           margin-bottom: 8px;
-          font-family: var(--font-display);
         }
+
         .error-message {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--text-secondary);
           line-height: 1.5;
-          margin-bottom: 24px;
-          max-width: 340px;
+          margin-bottom: 20px;
+          max-width: 320px;
         }
+
         .retry-btn {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 10px 20px;
-          border-radius: 12px;
+          padding: 8px 18px;
+          border-radius: 8px;
           border: none;
-          background: var(--accent-color);
+          background: var(--accent-primary);
           color: #ffffff;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
           cursor: pointer;
-          box-shadow: 0 4px 14px var(--accent-glow);
           transition: var(--transition-fast);
         }
+
         .retry-btn:hover {
-          filter: brightness(1.1);
-          transform: translateY(-1px);
-        }
-        .retry-btn:active {
-          transform: translateY(0);
+          opacity: 0.9;
         }
       `}</style>
     </div>

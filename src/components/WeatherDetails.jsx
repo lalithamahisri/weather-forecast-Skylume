@@ -1,232 +1,175 @@
 import React from 'react';
-import { Wind, Sun, Droplets, Eye, Gauge, ArrowUp } from 'lucide-react';
+import { Wind, Sun, Droplets, Eye, Gauge, Thermometer, Cloud, Sunrise, Sunset } from 'lucide-react';
 
 export default function WeatherDetails({ weather, unit }) {
   const current = weather.current;
 
-  const getUvLevel = (uv) => {
-    if (uv <= 2) return 'Low risk';
-    if (uv <= 5) return 'Moderate risk';
-    if (uv <= 7) return 'High risk';
-    return 'Very high risk';
-  };
+  // Convert values based on selected unit
+  const windVal = unit === 'F' ? Math.round(current.windSpeed * 0.621371) : current.windSpeed;
+  const windUnit = unit === 'F' ? 'mph' : 'km/h';
 
-  const getHumidityDesc = (hum) => {
-    if (hum < 30) return 'Dry air';
-    if (hum < 60) return 'Comfortable level';
-    if (hum < 80) return 'Sticky air';
-    return 'High moisture';
-  };
+  const visVal = unit === 'F' ? Math.round(current.visibility * 0.621371) : current.visibility;
+  const visUnit = unit === 'F' ? 'mi' : 'km';
 
-  const getVisibilityDesc = (vis) => {
-    if (vis >= 10) return 'Clear view';
-    if (vis >= 5) return 'Moderate visibility';
-    return 'Reduced visibility';
-  };
+  const dewPointVal = unit === 'F' ? Math.round((current.dewPoint * 9) / 5 + 32) : current.dewPoint;
 
-  const getPressureDesc = (press) => {
-    if (press >= 1013) return 'High pressure';
-    return 'Low pressure';
-  };
+  const sunriseTime = weather.daily[0]?.sunrise || '06:00';
+  const sunsetTime = weather.daily[0]?.sunset || '18:30';
 
-  const windSpeedVal = unit === 'F' ? `${Math.round(current.windSpeed * 0.621371)}` : `${current.windSpeed}`;
-  const windUnitStr = unit === 'F' ? 'mph' : 'km/h';
-
-  const visibilityVal = unit === 'F' ? `${Math.round(current.visibility * 0.621371)}` : `${current.visibility}`;
-  const visibilityUnitStr = unit === 'F' ? 'mi' : 'km';
+  const metrics = [
+    {
+      id: 'humidity',
+      label: 'HUMIDITY',
+      icon: Droplets,
+      value: `${current.humidity}%`,
+      subtext: current.humidity < 40 ? 'Comfortably Dry' : 'High Moisture'
+    },
+    {
+      id: 'wind',
+      label: 'WIND',
+      icon: Wind,
+      value: `${windVal} ${windUnit}`,
+      subtext: `Direction ${current.windDirection}°`
+    },
+    {
+      id: 'pressure',
+      label: 'PRESSURE',
+      icon: Gauge,
+      value: `${current.pressure} hPa`,
+      subtext: current.pressure >= 1013 ? 'Steady High' : 'Low Pressure'
+    },
+    {
+      id: 'visibility',
+      label: 'VISIBILITY',
+      icon: Eye,
+      value: `${visVal} ${visUnit}`,
+      subtext: current.visibility >= 10 ? 'Clear Atmosphere' : 'Reduced View'
+    },
+    {
+      id: 'uv',
+      label: 'UV INDEX',
+      icon: Sun,
+      value: `${current.uvIndex}`,
+      subtext: current.uvIndex <= 2 ? 'Low Risk' : current.uvIndex <= 5 ? 'Moderate' : 'High Risk'
+    },
+    {
+      id: 'dew-point',
+      label: 'DEW POINT',
+      icon: Thermometer,
+      value: `${dewPointVal}°`,
+      subtext: 'Condensation temp'
+    },
+    {
+      id: 'sun-cycle',
+      label: 'SUN CYCLE',
+      icon: Sunrise,
+      value: `${sunriseTime} / ${sunsetTime}`,
+      subtext: 'Sunrise & Sunset'
+    }
+  ];
 
   return (
-    <div className="condition-cards-row">
-      {/* 1. Wind Card */}
-      <div className="glass-panel condition-card">
-        <div className="card-top-row">
-          <div>
-            <div className="card-label">
-              <Wind size={13} style={{ color: '#94a3b8' }} />
-              <span>Wind</span>
+    <section className="details-clean-container">
+      <div className="details-clean-header">
+        <span className="sk-label">WEATHER TELEMETRY</span>
+      </div>
+
+      <div className="details-clean-grid">
+        {metrics.map((m) => {
+          const IconComp = m.icon;
+          return (
+            <div key={m.id} className="details-clean-item">
+              <div className="item-label-row">
+                <IconComp size={13} className="item-icon" />
+                <span className="sk-label">{m.label}</span>
+              </div>
+
+              <span className="item-val">{m.value}</span>
+              <span className="item-subtext">{m.subtext}</span>
             </div>
-            <div className="card-val">
-              {windSpeedVal} <span className="unit-sub">{windUnitStr}</span>
-            </div>
-          </div>
-          
-          <div className="compass-widget">
-            <span className="compass-n">N</span>
-            <div 
-              className="compass-arrow"
-              style={{ transform: `rotate(${current.windDirection}deg)` }}
-            >
-              <ArrowUp size={12} style={{ color: 'var(--accent-color)' }} />
-            </div>
-          </div>
-        </div>
-
-        <span className="card-context-line">From {current.windDirection}°</span>
-      </div>
-
-      {/* 2. UV Index Card */}
-      <div className="glass-panel condition-card">
-        <div>
-          <div className="card-label">
-            <Sun size={13} style={{ color: '#fde047' }} />
-            <span>UV Index</span>
-          </div>
-          <div className="card-val">{current.uvIndex}</div>
-        </div>
-        
-        <div>
-          <div className="uv-scale-bar">
-            <div className="uv-scale-fill" style={{ width: `${Math.min((current.uvIndex / 12) * 100, 100)}%` }} />
-          </div>
-          <span className="card-context-line">{getUvLevel(current.uvIndex)}</span>
-        </div>
-      </div>
-
-      {/* 3. Humidity Card */}
-      <div className="glass-panel condition-card">
-        <div>
-          <div className="card-label">
-            <Droplets size={13} style={{ color: '#38bdf8' }} />
-            <span>Humidity</span>
-          </div>
-          <div className="card-val">{current.humidity}%</div>
-        </div>
-        <span className="card-context-line">{getHumidityDesc(current.humidity)}</span>
-      </div>
-
-      {/* 4. Visibility Card */}
-      <div className="glass-panel condition-card">
-        <div>
-          <div className="card-label">
-            <Eye size={13} style={{ color: '#a7f3d0' }} />
-            <span>Visibility</span>
-          </div>
-          <div className="card-val">
-            {visibilityVal} <span className="unit-sub">{visibilityUnitStr}</span>
-          </div>
-        </div>
-        <span className="card-context-line">{getVisibilityDesc(current.visibility)}</span>
-      </div>
-
-      {/* 5. Pressure Card */}
-      <div className="glass-panel condition-card">
-        <div>
-          <div className="card-label">
-            <Gauge size={13} style={{ color: '#c084fc' }} />
-            <span>Pressure</span>
-          </div>
-          <div className="card-val">
-            {current.pressure} <span className="unit-sub">hPa</span>
-          </div>
-        </div>
-        <span className="card-context-line">{getPressureDesc(current.pressure)}</span>
+          );
+        })}
       </div>
 
       <style>{`
-        .condition-cards-row {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 16px;
+        .details-clean-container {
           width: 100%;
-        }
-        .condition-card {
-          padding: 16px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          height: 120px;
-          border-radius: 18px;
+          gap: 12px;
+          padding: 20px;
+          border-radius: var(--card-radius);
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(16px);
+          border: 1px solid var(--border-subtle);
         }
-        .card-top-row {
+
+        .details-clean-header {
           display: flex;
+          align-items: center;
           justify-content: space-between;
-          align-items: flex-start;
         }
-        .card-label {
+
+        .details-clean-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 10px;
+        }
+
+        .details-clean-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 10px 12px;
+          border-radius: var(--inner-radius);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid transparent;
+          transition: var(--transition-fast);
+        }
+
+        .details-clean-item:hover {
+          background: rgba(255, 255, 255, 0.06);
+          border-color: var(--border-subtle);
+        }
+
+        .item-label-row {
           display: flex;
           align-items: center;
           gap: 5px;
-          font-size: 11px;
-          color: var(--text-secondary);
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
         }
-        .card-val {
-          font-size: 22px;
-          font-weight: 800;
+
+        .item-icon {
+          color: var(--accent-primary);
+        }
+
+        .item-val {
           font-family: var(--font-display);
+          font-size: 16px;
+          font-weight: 700;
           color: var(--text-primary);
-          margin-top: 4px;
-        }
-        .unit-sub {
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--text-secondary);
-        }
-        .compass-widget {
-          position: relative;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          border: 1px solid var(--card-border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(15, 25, 45, 0.4);
-        }
-        .compass-n {
-          font-size: 7px;
-          font-weight: 800;
-          color: var(--text-muted);
-          position: absolute;
-          top: 1px;
-        }
-        .compass-arrow {
-          transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .uv-scale-bar {
-          height: 4px;
-          width: 100%;
-          background: rgba(255, 255, 255, 0.08);
-          border-radius: 10px;
-          overflow: hidden;
           margin-top: 2px;
         }
-        .uv-scale-fill {
-          height: 100%;
-          background: linear-gradient(to right, #4ade80, #facc15, #f87171);
-          border-radius: 10px;
-        }
-        .card-context-line {
-          font-size: 11px;
+
+        .item-subtext {
+          font-size: 10px;
           color: var(--text-secondary);
-          font-weight: 500;
-          margin-top: 4px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        @media (max-width: 1024px) {
-          .condition-cards-row {
-            grid-template-columns: repeat(3, 1fr);
+
+        @media (max-width: 1100px) {
+          .details-clean-grid {
+            grid-template-columns: repeat(4, 1fr);
           }
         }
+
         @media (max-width: 640px) {
-          .condition-cards-row {
+          .details-clean-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-          }
-        }
-        @media (max-width: 400px) {
-          .condition-cards-row {
-            grid-template-columns: 1fr;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }

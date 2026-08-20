@@ -88,7 +88,7 @@ export function useWeather() {
   const fetchWeather = useCallback(async (lat, lng, locDetails) => {
     setError(null);
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,is_day&hourly=temperature_2m,weather_code,precipitation_probability,uv_index,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max&timezone=auto`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m,is_day,dew_point_2m,cloud_cover&hourly=temperature_2m,weather_code,precipitation_probability,uv_index,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max&timezone=auto`;
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -127,6 +127,8 @@ export function useWeather() {
         visibility: Math.round(currentVisibility / 1000),
         pressure: Math.round(data.current.pressure_msl),
         uvIndex: Math.round(currentUvIndex),
+        dewPoint: data.current.dew_point_2m !== undefined ? Math.round(data.current.dew_point_2m) : Math.round(data.current.temperature_2m - ((100 - data.current.relative_humidity_2m) / 5)),
+        cloudCover: data.current.cloud_cover !== undefined ? Math.round(data.current.cloud_cover) : 40,
         isDay: data.current.is_day === 1,
         high: Math.round(data.daily.temperature_2m_max[0]),
         low: Math.round(data.daily.temperature_2m_min[0]),

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CloudLightning, Compass, Loader2 } from 'lucide-react';
+import { Compass, Loader2, Sun, Moon } from 'lucide-react';
 import LocationSearch from './LocationSearch';
 
 export default function Header({
@@ -8,141 +8,155 @@ export default function Header({
   unit,
   onToggleUnit,
   onUseCurrentLocation,
-  isLocating
+  isLocating,
+  theme,
+  onToggleTheme
 }) {
   return (
-    <header className="glass-panel app-header">
+    <header className="app-header-clean">
       {/* Brand logo left */}
-      <div
-        className="brand-logo"
-        onClick={() => window.location.reload()}
-        title="Skylume Dashboard"
-      >
-        <CloudLightning size={24} className="logo-icon" />
-        <span className="logo-text">Skylume</span>
+      <div className="brand-block-clean" onClick={() => window.location.reload()} title="Skylume Weather">
+        <span className="brand-title">SKYLUME</span>
+        <span className="brand-subtitle">WEATHER INTELLIGENCE</span>
       </div>
 
-      {/* Centered search bar */}
-      <div className="header-search-container">
+      {/* Center Search Bar */}
+      <div className="header-search-box">
         <LocationSearch onSelectLocation={onSelectLocation} onSearchQuery={onSearchQuery} />
       </div>
 
-      {/* Action controls right */}
-      <div className="header-actions">
-        {/* Geolocation button */}
+      {/* Action Controls Right */}
+      <div className="header-actions-clean">
+        {/* Geolocation Button */}
         <button
           type="button"
           onClick={onUseCurrentLocation}
           disabled={isLocating}
-          className="header-action-btn location-btn"
-          title="Use current location"
+          className="clean-btn"
+          title="Use my current location"
         >
-          {isLocating ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              <span className="btn-label">Locating...</span>
-            </>
-          ) : (
-            <>
-              <Compass size={16} />
-              <span className="btn-label">Location</span>
-            </>
-          )}
+          {isLocating ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
+          <span className="btn-label">My Location</span>
         </button>
 
-        {/* Temperature unit switch (°C / °F) */}
+        {/* °C / °F Unit Switcher */}
         <button
           type="button"
           onClick={onToggleUnit}
-          className="header-action-btn unit-toggle-btn"
-          title={`Switch to °${unit === 'C' ? 'F' : 'C'}`}
+          className="clean-btn unit-switch-btn"
+          title={`Switch temperature unit to °${unit === 'C' ? 'F' : 'C'}`}
         >
-          °{unit}
+          <span className={unit === 'C' ? 'unit-active' : ''}>°C</span>
+          <span className="unit-slash">/</span>
+          <span className={unit === 'F' ? 'unit-active' : ''}>°F</span>
+        </button>
+
+        {/* Theme Toggle */}
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          className="clean-btn theme-switch-btn"
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} theme`}
+        >
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
         </button>
       </div>
 
       <style>{`
-        .app-header {
+        .app-header-clean {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 12px 20px;
+          padding: 8px 0;
           gap: 16px;
           width: 100%;
-          border-radius: 20px;
           position: relative;
-          z-index: 1000;
+          z-index: 100;
         }
-        .brand-logo {
+
+        .brand-block-clean {
           display: flex;
-          align-items: center;
-          gap: 10px;
+          flex-direction: column;
           cursor: pointer;
           user-select: none;
         }
-        .logo-icon {
-          color: var(--accent-color);
-          stroke-width: 2.2;
-        }
-        .logo-text {
-          font-size: 20px;
+
+        .brand-title {
           font-family: var(--font-display);
+          font-size: 18px;
           font-weight: 800;
-          letter-spacing: -0.02em;
-          background: linear-gradient(135deg, #f8fafc 30%, var(--accent-color) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          letter-spacing: 0.08em;
+          color: var(--text-primary);
+          line-height: 1;
         }
-        .header-search-container {
+
+        .brand-subtitle {
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          color: var(--text-muted);
+          margin-top: 2px;
+        }
+
+        .header-search-box {
           flex: 1;
-          display: flex;
-          justify-content: center;
           max-width: 420px;
         }
-        .header-actions {
+
+        .header-actions-clean {
           display: flex;
           align-items: center;
-          gap: 10px;
-        }
-        .header-action-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
           gap: 8px;
-          padding: 10px 14px;
-          border-radius: 12px;
-          border: 1px solid var(--card-border);
-          background: rgba(15, 25, 45, 0.6);
+        }
+
+        .clean-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          height: 36px;
+          padding: 0 12px;
+          border-radius: 10px;
+          border: 1px solid var(--border-subtle);
+          background: rgba(255, 255, 255, 0.04);
+          backdrop-filter: blur(12px);
           color: var(--text-primary);
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
           cursor: pointer;
           transition: var(--transition-fast);
         }
-        .header-action-btn:hover {
-          background: var(--card-bg-hover);
-          border-color: var(--card-border-hover);
-          transform: translateY(-1px);
+
+        .clean-btn:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: var(--border-medium);
+          color: var(--accent-primary);
         }
-        .header-action-btn:active {
-          transform: translateY(0);
-        }
-        .unit-toggle-btn {
-          width: 40px;
-          height: 40px;
-          padding: 0;
-          font-size: 14px;
+
+        .unit-switch-btn {
+          padding: 0 10px;
+          font-family: var(--font-display);
+          font-size: 12px;
           font-weight: 700;
+          gap: 3px;
         }
-        @media (max-width: 640px) {
-          .btn-label {
+
+        .unit-active {
+          color: var(--accent-primary);
+        }
+
+        .unit-slash {
+          color: var(--text-muted);
+          font-weight: 400;
+        }
+
+        .theme-switch-btn {
+          padding: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+          .btn-label,
+          .brand-subtitle {
             display: none;
-          }
-          .app-header {
-            padding: 10px 12px;
-          }
-          .logo-text {
-            font-size: 17px;
           }
         }
       `}</style>

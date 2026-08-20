@@ -8,13 +8,13 @@ export default function LocationSearch({ onSelectLocation, onSearchQuery }) {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const debouncedQuery = useDebounce(query, 350);
+  const debouncedQuery = useDebounce(query, 300);
   const wrapperRef = useRef(null);
 
-  // Close popup on click outside
+  // Close suggestions when clicking outside
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+    function handleClickOutside(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     }
@@ -22,7 +22,7 @@ export default function LocationSearch({ onSelectLocation, onSearchQuery }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fetch location suggestions
+  // Fetch location autocomplete suggestions
   useEffect(() => {
     if (debouncedQuery.trim().length < 2) {
       setSuggestions([]);
@@ -103,19 +103,19 @@ export default function LocationSearch({ onSelectLocation, onSearchQuery }) {
 
   return (
     <div className="location-search-wrapper" ref={wrapperRef}>
-      <form onSubmit={(e) => { e.preventDefault(); handleTriggerSearch(query); }} className="search-input-container">
+      <form onSubmit={(e) => { e.preventDefault(); handleTriggerSearch(query); }} className="search-form">
         <button
-          type="button"
-          onClick={() => handleTriggerSearch(query)}
+          type="submit"
           title="Search location"
-          className="search-icon-btn"
+          className="search-btn"
+          aria-label="Submit search"
         >
-          <Search size={18} />
+          <Search size={15} />
         </button>
 
         <input
           type="text"
-          placeholder="Search city or location (e.g. London, Tokyo)..."
+          placeholder="Search city (e.g. London, Tokyo, Hyderabad)..."
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -124,28 +124,30 @@ export default function LocationSearch({ onSelectLocation, onSearchQuery }) {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           className="search-input"
+          aria-label="Search city or location"
         />
 
         {loading && (
-          <div className="search-loader-icon">
-            <Loader2 size={16} className="animate-spin" />
+          <div className="search-spinner">
+            <Loader2 size={14} className="animate-spin" />
           </div>
         )}
       </form>
 
+      {/* Autocomplete Dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <ul className="suggestions-list glass-panel">
+        <ul className="suggestions-dropdown sk-panel">
           {suggestions.map((item, index) => (
             <li
               key={item.id || index}
               onClick={() => handleSelect(item)}
               onMouseEnter={() => setActiveIndex(index)}
-              className={`suggestion-item ${activeIndex === index ? 'suggestion-item-active' : ''}`}
+              className={`suggestion-item ${activeIndex === index ? 'suggestion-active' : ''}`}
             >
-              <MapPin size={16} className="suggestion-pin" />
-              <div className="suggestion-text">
-                <span className="suggestion-name">{item.name}</span>
-                <span className="suggestion-subtext">
+              <MapPin size={14} className="suggestion-icon" />
+              <div className="suggestion-info">
+                <span className="suggestion-city">{item.name}</span>
+                <span className="suggestion-region">
                   {[item.admin1, item.country].filter(Boolean).join(', ')}
                 </span>
               </div>
@@ -158,101 +160,111 @@ export default function LocationSearch({ onSelectLocation, onSearchQuery }) {
         .location-search-wrapper {
           position: relative;
           width: 100%;
-          max-width: 420px;
         }
-        .search-input-container {
+
+        .search-form {
           position: relative;
-          width: 100%;
           display: flex;
           align-items: center;
+          width: 100%;
         }
-        .search-icon-btn {
+
+        .search-btn {
           position: absolute;
           left: 12px;
           background: none;
           border: none;
-          color: var(--text-secondary);
+          color: var(--text-muted);
           cursor: pointer;
-          padding: 4px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: 50%;
-          z-index: 2;
           transition: var(--transition-fast);
+          z-index: 2;
         }
-        .search-icon-btn:hover {
-          color: var(--accent-color);
+
+        .search-btn:hover {
+          color: var(--accent-primary);
         }
+
         .search-input {
           width: 100%;
-          padding: 12px 42px 12px 44px;
-          font-size: 14px;
+          height: 38px;
+          padding: 0 36px 0 38px;
+          font-size: 13px;
           font-weight: 500;
           font-family: var(--font-sans);
           color: var(--text-primary);
-          background: rgba(15, 25, 45, 0.6);
-          border: 1px solid var(--card-border);
-          border-radius: 14px;
+          background: var(--bg-primary);
+          border: 1px solid var(--border-subtle);
+          border-radius: 10px;
           outline: none;
-          backdrop-filter: blur(var(--glass-blur));
-          transition: var(--transition-smooth);
+          transition: var(--transition-fast);
         }
+
         .search-input:focus {
-          border-color: var(--accent-color);
+          border-color: var(--border-focus);
           box-shadow: 0 0 0 3px var(--accent-glow);
-          background: rgba(15, 25, 45, 0.85);
         }
-        .search-loader-icon {
+
+        .search-spinner {
           position: absolute;
-          right: 14px;
-          color: var(--accent-color);
+          right: 12px;
+          color: var(--accent-primary);
           display: flex;
           align-items: center;
           pointer-events: none;
         }
-        .suggestions-list {
+
+        .suggestions-dropdown {
           position: absolute;
-          top: calc(100% + 8px);
+          top: calc(100% + 6px);
           left: 0;
           right: 0;
-          z-index: 9999;
+          z-index: 1000;
           list-style: none;
-          padding: 6px;
-          border-radius: 16px;
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
-          background: rgba(15, 25, 45, 0.95);
+          padding: 4px;
+          border-radius: var(--inner-radius);
+          box-shadow: var(--shadow-lg);
+          background: var(--bg-primary);
+          border: 1px solid var(--border-medium);
         }
+
         .suggestion-item {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 10px 14px;
-          border-radius: 12px;
+          gap: 10px;
+          padding: 8px 12px;
+          border-radius: 6px;
           cursor: pointer;
           transition: var(--transition-fast);
         }
-        .suggestion-item-active {
-          background: var(--card-bg-hover);
+
+        .suggestion-active {
+          background: var(--bg-surface-hover);
         }
-        .suggestion-pin {
-          color: var(--accent-color);
+
+        .suggestion-icon {
+          color: var(--accent-primary);
           flex-shrink: 0;
         }
-        .suggestion-text {
+
+        .suggestion-info {
           display: flex;
           flex-direction: column;
           overflow: hidden;
         }
-        .suggestion-name {
-          font-size: 14px;
+
+        .suggestion-city {
+          font-size: 13px;
           font-weight: 600;
           color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        .suggestion-subtext {
+
+        .suggestion-region {
           font-size: 11px;
           color: var(--text-secondary);
           white-space: nowrap;

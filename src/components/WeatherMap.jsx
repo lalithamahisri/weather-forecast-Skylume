@@ -8,7 +8,7 @@ const formatTemp = (celsius, unit) => {
   return `${celsius}°C`;
 };
 
-export default function WeatherMap({ location, weatherData, onMapClick, unit = 'C' }) {
+export default function WeatherMap({ location, weatherData, onMapClick, unit = 'C', theme = 'dark' }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
@@ -63,7 +63,7 @@ export default function WeatherMap({ location, weatherData, onMapClick, unit = '
     };
   }, []);
 
-  // Base Tile Layer with Fallback (CartoDB Dark -> OpenStreetMap)
+  // Base Tile Layer with Fallback (CartoDB Dark in dark mode, CartoDB Voyager in bright mode)
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -72,8 +72,13 @@ export default function WeatherMap({ location, weatherData, onMapClick, unit = '
       map.removeLayer(tileLayerRef.current);
     }
 
-    const primaryUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    const fallbackUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const isLight = theme === 'light';
+    const primaryUrl = isLight
+      ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const fallbackUrl = isLight
+      ? 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'
+      : 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
     const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
 
     const tileLayer = L.tileLayer(primaryUrl, {
@@ -90,7 +95,7 @@ export default function WeatherMap({ location, weatherData, onMapClick, unit = '
 
     tileLayer.addTo(map);
     tileLayerRef.current = tileLayer;
-  }, []);
+  }, [theme]);
 
   // Custom DivIcon Marker & Smooth FlyTo (without autoPan scroll jump)
   useEffect(() => {
@@ -308,7 +313,7 @@ export default function WeatherMap({ location, weatherData, onMapClick, unit = '
   }, [activeLayer, location, weatherData, unit]);
 
   return (
-    <div className="weather-map-wrapper glass-panel">
+    <div className="weather-map-wrapper sk-panel">
       <div 
         ref={mapContainerRef} 
         className="map-container-element"
@@ -329,9 +334,8 @@ export default function WeatherMap({ location, weatherData, onMapClick, unit = '
           width: 100%;
           height: 100%;
           min-height: 420px;
-          border-radius: 20px;
+          border-radius: var(--card-radius);
           overflow: hidden;
-          box-shadow: 0 8px 32px var(--shadow-color);
         }
         .map-container-element {
           width: 100%;
